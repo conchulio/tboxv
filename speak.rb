@@ -25,8 +25,12 @@ def check_if_possible menu, menu_position
     sub_menu_name = ''
     previous_menu = current_menu
     case item
-    when 'left', 'up'
+    when 'left'
       raise "There shouldn't be #{item} in the menu position."
+    when 'up'
+      current_menu = [sub_menu[-1]]
+      menu_position = menu_position[0..-2]
+      menu_position += ['down']*(sub_menu.length-1)
     when 'right'
       if current_menu[0]['sub_menu']
         sub_menu_name = 'menu '+current_menu[0]['name']
@@ -44,9 +48,11 @@ def check_if_possible menu, menu_position
   end
   # We're at the lower end of the menu
   if !current_menu[0]
-    puts 'end of menu'
+    # puts 'end of menu'
     current_menu = sub_menu
-    # Remove all the 'down's
+    # Remove all the 'down's, jump to top of menu again.
+    # Should be disabled if set top box doesn't jump to the top when
+    # the bottom of the menu is reached.
     menu_position = remove_specific_instruction_type_from_end menu_position, 'down'
   end
   puts "\n"
@@ -85,6 +91,8 @@ while instruction = gets.chomp
   when 'up'
     if last_element == 'down'
       menu_position = menu_position[0..-2]
+    else 
+      menu_position.push instruction
     end
   when 'down', 'right'
     menu_position.push instruction
