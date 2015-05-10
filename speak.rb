@@ -87,8 +87,8 @@ puts menu
 
 menu_position = []
 
-`#{program} main menu`
-`#{program} #{menu[0]['name']}`
+`#{program} "main menu"`
+`#{program} "#{menu[0]['name']}"`
 while instruction = gets.chomp
   last_element = menu_position[-1]
   case instruction
@@ -98,7 +98,7 @@ while instruction = gets.chomp
       menu_position = remove_specific_instruction_type_from_end menu_position, $down_key
       # Remove $right_key item from menu position
       menu_position = menu_position[0..-2]
-      `#{program} back`
+      `#{program} "back"`
     end
   when $up_key
     if last_element == $down_key
@@ -112,5 +112,5 @@ while instruction = gets.chomp
     STDERR.puts "Unknown instruction '#{instruction}'"
   end
   item_to_speak, menu_position = check_if_possible menu, menu_position
-  `#{program} #{item_to_speak}`
+  `#{program} "#{item_to_speak}"`
 end
