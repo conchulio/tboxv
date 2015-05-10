@@ -1,12 +1,17 @@
 #!/usr/bin/env ruby
 
+### TODO
+# Map other keys as well
+# Upload tutorial to github
+# Check why KEY_RIGHT doesn't work 
+
 require 'yaml'
 
 ### KEY DEFINITIONS
-$right_key = 'KEY_RIGHT'
-$left_key = 'KEY_LEFT'
-$up_key = 'KEY_UP'
-$down_key = 'KEY_DOWN'
+$key_right = 'KEY_RIGHT'
+$key_left = 'KEY_LEFT'
+$key_up = 'KEY_UP'
+$key_down = 'KEY_DOWN'
 
 
 
@@ -33,19 +38,19 @@ def check_if_possible menu, menu_position
     sub_menu_name = ''
     previous_menu = current_menu
     case item
-    when $left_key
+    when $key_left
       raise "There shouldn't be #{item} in the menu position."
-    when $up_key
+    when $key_up
       current_menu = [sub_menu[-1]]
       menu_position = menu_position[0..-2]
-      menu_position += [$down_key]*(sub_menu.length-1)
-    when $right_key
+      menu_position += [$key_down]*(sub_menu.length-1)
+    when $key_right
       if current_menu[0]['sub_menu']
         sub_menu_name = 'menu '+current_menu[0]['name']
         sub_menu = current_menu[0]['sub_menu']
       end
       current_menu = current_menu[0]['sub_menu']
-    when $down_key
+    when $key_down
       current_menu = current_menu[1..-1]
     end
   end
@@ -58,10 +63,10 @@ def check_if_possible menu, menu_position
   if !current_menu[0]
     # puts 'end of menu'
     current_menu = sub_menu
-    # Remove all the $down_keys, jump to top of menu again.
+    # Remove all the $key_downs, jump to top of menu again.
     # Should be disabled if set top box doesn't jump to the top when
     # the bottom of the menu is reached.
-    menu_position = remove_specific_instruction_type_from_end menu_position, $down_key
+    menu_position = remove_specific_instruction_type_from_end menu_position, $key_down
   end
   puts "\n"
   if sub_menu_name != ''
@@ -93,21 +98,21 @@ while instruction = gets.chomp
   puts "Instruction received: "+instruction
   last_element = menu_position[-1]
   case instruction
-  when $left_key
-    if menu_position.include? $right_key
-      # Remove all the $down_keys
-      menu_position = remove_specific_instruction_type_from_end menu_position, $down_key
-      # Remove $right_key item from menu position
+  when $key_left
+    if menu_position.include? $key_right
+      # Remove all the $key_downs
+      menu_position = remove_specific_instruction_type_from_end menu_position, $key_down
+      # Remove $key_right item from menu position
       menu_position = menu_position[0..-2]
       `#{program} "back"`
     end
-  when $up_key
-    if last_element == $down_key
+  when $key_up
+    if last_element == $key_down
       menu_position = menu_position[0..-2]
     else 
       menu_position.push instruction
     end
-  when $down_key, $right_key
+  when $key_down, $key_right
     menu_position.push instruction
   else
     STDERR.puts "Unknown instruction '#{instruction}'"
