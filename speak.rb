@@ -90,6 +90,7 @@ menu_position = []
 `#{program} "main menu"`
 `#{program} "#{menu[0]['name']}"`
 while instruction = gets.chomp
+  puts "Instruction received: "+instruction
   last_element = menu_position[-1]
   case instruction
   when $left_key
