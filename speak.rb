@@ -85,8 +85,12 @@ while instruction = gets.chomp
   last_element = menu_position[-1]
   case instruction
   when 'left'
-    if last_element == 'right'
+    if menu_position.include? 'right'
+      # Remove all the 'down's
+      menu_position = remove_specific_instruction_type_from_end menu_position, 'down'
+      # Remove 'right' item from menu position
       menu_position = menu_position[0..-2]
+      `#{program} back`
     end
   when 'up'
     if last_element == 'down'
