@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 
 ### TODO
-# Map other keys as well
 # Upload tutorial to github
 # Check why KEY_RIGHT doesn't work 
+# Check all the keys and how they influence each other
 
 require 'yaml'
 
@@ -12,8 +12,12 @@ $key_right = 'KEY_RIGHT'
 $key_left = 'KEY_LEFT'
 $key_up = 'KEY_UP'
 $key_down = 'KEY_DOWN'
+$key_menu = 'KEY_MENU'
+$key_exit = 'KEY_EXIT'
 
-
+$key_mapping = {
+  'KEY_OK' => 'KEY_RIGHT'
+}
 
 def remove_specific_instruction_type_from_end menu_position, instruction_type
   reversed = menu_position.reverse
@@ -68,7 +72,6 @@ def check_if_possible menu, menu_position
     # the bottom of the menu is reached.
     menu_position = remove_specific_instruction_type_from_end menu_position, $key_down
   end
-  puts "\n"
   if sub_menu_name != ''
     thing_to_say = sub_menu_name+' '+current_menu[0]['name']
   else
@@ -92,11 +95,31 @@ puts menu
 
 menu_position = []
 
-`#{program} "main menu"`
-`#{program} "#{menu[0]['name']}"`
+$menu_state = 'not in the menu'
+
 while instruction = gets.chomp
   puts "Instruction received: "+instruction
+  if mapped_key = $key_mapping[instruction]
+    instruction = mapped_key
+  end
+  if instruction == $key_exit
+    `#{program} "exiting the menu"`
+    $menu_state = 'not in the menu'
+    menu_position = []
+    next
+  end
+  if instruction == $key_menu && $menu_state == 'not in the menu'
+    `#{program} "main menu"`
+    $menu_state = 'in the menu'
+  end
+  if $menu_state == 'not in the menu'
+    puts "No instruction being executed because you're not in the menu"
+    next
+  end
+  puts "Instruction to execute: "+instruction
   last_element = menu_position[-1]
+
+  # We received a regular instruction
   case instruction
   when $key_left
     if menu_position.include? $key_right
