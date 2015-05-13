@@ -1,10 +1,5 @@
 #!/usr/bin/env ruby
 
-### TODO
-# Upload tutorial to github
-# Check why KEY_RIGHT doesn't work 
-# Check all the keys and how they influence each other
-
 require 'yaml'
 
 ### KEY DEFINITIONS
@@ -97,8 +92,10 @@ menu_position = []
 
 $menu_state = 'not in the menu'
 
-while instruction = gets.chomp
+while instruction = gets.chomp.strip
   puts "Instruction received: "+instruction
+  instruction = /KEY_[A-Z]*/.match(instruction).to_s
+  puts "Filtered key: "+instruction
   if mapped_key = $key_mapping[instruction]
     instruction = mapped_key
   end
