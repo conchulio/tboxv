@@ -112,7 +112,7 @@ end
 $time_of_last_command = nil
 $previous_command = nil
 # if same command arrives within $threshold, ignore it
-$threshold = 250.0
+$threshold = 500.0
 
 while instruction = gets.chomp.strip
   $prefix = ""
