@@ -1,14 +1,43 @@
-- name: First point
-- name: Second point
-- name: Third point
-- name: Fourth point
-  sub_menu:
-    - name: First sub point
-    - name: Second sub point
-      sub_menu: 
-        - name: First sub sub point
-        - name: Second sub sub point
-    - name: Third sub point
-    - name: Fourth sub point
+# - name: First point
+# - name: Second point
+# - name: Third point
+# - name: Fourth point
+#   sub_menu:
+#     - name: First sub point
+#     - name: Second sub point
+#       sub_menu: 
+#         - name: First sub sub point
+#         - name: Second sub sub point
+#     - name: Third sub point
+#     - name: Fourth sub point
 # - name: Fifth point
 # - name: Sixth point
+
+- name: picture
+- name: lock
+- name: audio
+  sub_menu: 
+    - name: sound mode
+      sub_menu:
+        - name: Standard User
+        - name: News
+        - name: Music
+        - name: Cinema
+        - name: Sport
+        - name: Game
+    - name: sound effect
+    - name: auto volume
+    - name: sound out
+      sub_menu: 
+        - name: TV speaker
+        - name: Headphone
+        - name: Close
+    - name: AV Sync. Adjust
+    - name: Sound Optimizer
+- name: option
+- name: setup
+- name: input
+- name: time
+- name: my media
+
+

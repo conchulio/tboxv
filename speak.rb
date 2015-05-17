@@ -92,6 +92,15 @@ menu_position = []
 
 $menu_state = 'not in the menu'
 
+def time_diff_milli start, finish
+  (finish - start) * 1000.0
+end
+
+$time_of_last_command = nil
+$previous_command = nil
+# if same command arrives within $threshold, ignore it
+$threshold = 3000.0
+
 while instruction = gets.chomp.strip
   puts "Instruction received: "+instruction
   instruction = /KEY_[A-Z]*/.match(instruction).to_s
@@ -99,6 +108,27 @@ while instruction = gets.chomp.strip
   if mapped_key = $key_mapping[instruction]
     instruction = mapped_key
   end
+
+  if $time_of_last_command && $previous_command && 
+     $previous_command == instruction &&
+     ['KEY_MENU', 'KEY_RIGHT', 'KEY_LEFT', 'KEY_EXIT'].include?(instruction) &&
+     time_diff_milli($time_of_last_command, Time.now) < $threshold
+    puts "Skip this command because the same command just came #{time_diff_milli($time_of_last_command, Time.now)} ago which is less then #{$threshold}."
+    next
+  end
+  if $time_of_last_command && $previous_command && 
+     $previous_command == instruction &&
+     ['KEY_DOWN', 'KEY_UP'].include?(instruction) &&
+     time_diff_milli($time_of_last_command, Time.now) < ($threshold/2.0)
+    puts "Skip this command because the same command just came #{time_diff_milli($time_of_last_command, Time.now)} ago which is less then #{$threshold/2.0}."
+    next
+  end
+  if $time_of_last_command
+    puts "#{time_diff_milli($time_of_last_command, Time.now)}"
+  end
+  $previous_command = instruction
+  $time_of_last_command = Time.now
+
   if instruction == $key_exit
     `#{program} "exiting the menu"`
     $menu_state = 'not in the menu'
