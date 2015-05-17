@@ -19,7 +19,7 @@
   sub_menu: 
     - name: sound mode
       sub_menu:
-        - name: Standard User
+        - name: Standard (User)
         - name: News
         - name: Music
         - name: Cinema

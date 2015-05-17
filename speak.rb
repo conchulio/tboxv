@@ -9,10 +9,30 @@ $key_up = 'KEY_UP'
 $key_down = 'KEY_DOWN'
 $key_menu = 'KEY_MENU'
 $key_exit = 'KEY_EXIT'
+$key_power = 'KEY_POWER'
 
 $key_mapping = {
   'KEY_OK' => 'KEY_RIGHT'
 }
+
+# On Mac
+if (/darwin/ =~ RUBY_PLATFORM) != nil
+  $program = 'say'
+# On Linux
+else
+  $program = 'espeak'
+end
+
+$previous_pid = nil
+
+def speak text
+  if $previous_pid
+    Process.kill('TERM', $previous_pid)
+  end
+  stuff_to_say = "\"#{$prefix}#{text}\""
+  puts "Saying: #{stuff_to_say}"
+  $previous_pid = spawn "#{$program} #{stuff_to_say}"
+end
 
 def remove_specific_instruction_type_from_end menu_position, instruction_type
   reversed = menu_position.reverse
@@ -68,21 +88,14 @@ def check_if_possible menu, menu_position
     menu_position = remove_specific_instruction_type_from_end menu_position, $key_down
   end
   if sub_menu_name != ''
-    thing_to_say = sub_menu_name+' '+current_menu[0]['name']
+    thing_to_say = sub_menu_name+'; '+current_menu[0]['name']
   else
     thing_to_say = current_menu[0]['name']
   end
-  puts thing_to_say
   return thing_to_say, menu_position
 end
 
 file_name = ARGV.shift || 'menu.yaml'
-
-if (/darwin/ =~ RUBY_PLATFORM) != nil
-  program = 'say'
-else
-  program = 'espeak'
-end
 
 menu = YAML.load_file file_name
 
@@ -99,9 +112,10 @@ end
 $time_of_last_command = nil
 $previous_command = nil
 # if same command arrives within $threshold, ignore it
-$threshold = 3000.0
+$threshold = 250.0
 
 while instruction = gets.chomp.strip
+  $prefix = ""
   puts "Instruction received: "+instruction
   instruction = /KEY_[A-Z]*/.match(instruction).to_s
   puts "Filtered key: "+instruction
@@ -111,16 +125,8 @@ while instruction = gets.chomp.strip
 
   if $time_of_last_command && $previous_command && 
      $previous_command == instruction &&
-     ['KEY_MENU', 'KEY_RIGHT', 'KEY_LEFT', 'KEY_EXIT'].include?(instruction) &&
      time_diff_milli($time_of_last_command, Time.now) < $threshold
     puts "Skip this command because the same command just came #{time_diff_milli($time_of_last_command, Time.now)} ago which is less then #{$threshold}."
-    next
-  end
-  if $time_of_last_command && $previous_command && 
-     $previous_command == instruction &&
-     ['KEY_DOWN', 'KEY_UP'].include?(instruction) &&
-     time_diff_milli($time_of_last_command, Time.now) < ($threshold/2.0)
-    puts "Skip this command because the same command just came #{time_diff_milli($time_of_last_command, Time.now)} ago which is less then #{$threshold/2.0}."
     next
   end
   if $time_of_last_command
@@ -129,17 +135,7 @@ while instruction = gets.chomp.strip
   $previous_command = instruction
   $time_of_last_command = Time.now
 
-  if instruction == $key_exit
-    `#{program} "exiting the menu"`
-    $menu_state = 'not in the menu'
-    menu_position = []
-    next
-  end
-  if instruction == $key_menu && $menu_state == 'not in the menu'
-    `#{program} "main menu"`
-    $menu_state = 'in the menu'
-  end
-  if $menu_state == 'not in the menu'
+  if instruction != $key_menu && $menu_state == 'not in the menu'
     puts "No instruction being executed because you're not in the menu"
     next
   end
@@ -148,13 +144,28 @@ while instruction = gets.chomp.strip
 
   # We received a regular instruction
   case instruction
+  when $key_power
+    if $menu_state == 'in the menu'
+      $menu_state = 'not in the menu'
+      speak "Bye bye; Thanks for using tee box vee"
+      next
+    end
+  when $key_menu
+    if $menu_state == 'not in the menu'
+      $prefix = "main menu; "
+      $menu_state = 'in the menu'
+    end
+  when $key_exit
+    speak "exiting the menu"
+    $menu_state = 'not in the menu'
+    menu_position = []
   when $key_left
     if menu_position.include? $key_right
       # Remove all the $key_downs
       menu_position = remove_specific_instruction_type_from_end menu_position, $key_down
       # Remove $key_right item from menu position
       menu_position = menu_position[0..-2]
-      `#{program} "back"`
+      speak "back"
     end
   when $key_up
     if last_element == $key_down
@@ -168,5 +179,5 @@ while instruction = gets.chomp.strip
     STDERR.puts "Unknown instruction '#{instruction}'"
   end
   item_to_speak, menu_position = check_if_possible menu, menu_position
-  `#{program} "#{item_to_speak}"`
+  speak "#{item_to_speak}"
 end
