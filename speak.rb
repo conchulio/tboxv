@@ -159,6 +159,7 @@ while instruction = gets.chomp.strip
     speak "exiting the menu"
     $menu_state = 'not in the menu'
     menu_position = []
+    next
   when $key_left
     if menu_position.include? $key_right
       # Remove all the $key_downs
