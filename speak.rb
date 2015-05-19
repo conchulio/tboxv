@@ -147,7 +147,7 @@ while instruction = gets.chomp.strip
   when $key_power
     if $menu_state == 'in the menu'
       $menu_state = 'not in the menu'
-      speak "Bye bye; Thanks for using tee box vee"
+      speak "Bye bye from tee box vee"
       next
     end
   when $key_menu
