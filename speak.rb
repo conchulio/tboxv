@@ -147,7 +147,7 @@ while instruction = gets.chomp.strip
   when $key_power
     if $menu_state == 'in the menu'
       $menu_state = 'not in the menu'
-      speak "Bye bye; Thanks for using tee box vee"
+      speak "Bye bye from tee box vee"
       next
     end
   when $key_menu
@@ -166,7 +166,7 @@ while instruction = gets.chomp.strip
       menu_position = remove_specific_instruction_type_from_end menu_position, $key_down
       # Remove $key_right item from menu position
       menu_position = menu_position[0..-2]
-      speak "back"
+      $prefix = "back; "
     end
   when $key_up
     if last_element == $key_down
